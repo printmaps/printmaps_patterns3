@@ -7,6 +7,7 @@ Description:
 
 Releases:
 - v0.1.0 - 2019/05/07 : initial release
+- v0.2.0 - 2019/05/10 : dot patterns added
 
 Author:
 - Klaus Tockloth
@@ -52,8 +53,8 @@ import (
 // general program info
 var (
 	progName    = os.Args[0]
-	progVersion = "v0.1.0"
-	progDate    = "2019/05/06"
+	progVersion = "v0.2.0"
+	progDate    = "2019/05/10"
 	progPurpose = "generates svg patterns (hatches)"
 	progInfo    = "Printmaps utility program."
 )
@@ -91,6 +92,7 @@ func main() {
 	printUsage()
 	generateLines()
 	generateGrids()
+	generateDots()
 }
 
 /*
@@ -221,7 +223,6 @@ func generateLines() {
 			}
 		}
 	}
-
 }
 
 /*
@@ -294,6 +295,42 @@ func generateGrids() {
 			}
 			if err := file.Close(); err != nil {
 				log.Fatalf("error <%v> at file.Close(), file = <%v>", err, filename)
+			}
+		}
+	}
+}
+
+/*
+generateDots generates some simple svg dot patterns
+*/
+func generateDots() {
+
+	for name, hexcolor := range colors {
+		for diameter := 1; diameter <= 3; diameter++ {
+			for distance := 10; distance <= 20; distance += 10 {
+				filename := fmt.Sprintf("./patterns/Printmaps_Dot%d_%s_%d.svg", distance, name, diameter)
+				fmt.Printf("generate %s ...\n", filename)
+				file, err := os.OpenFile(filename, os.O_WRONLY|os.O_TRUNC|os.O_CREATE, 0666)
+				if err != nil {
+					log.Fatalf("error <%v> at os.OpenFile(), file = <%v>", err, filename)
+				}
+				writer := bufio.NewWriter(file)
+				fmt.Fprintf(writer, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+				fmt.Fprintf(writer, "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" style=\"isolation:isolate\" viewBox=\"0 0 200 200\" width=\"200\" height=\"200\">\n")
+				// hack: draw a transparent rectangle to avoid that mapnik cuts off the empty margins
+				fmt.Fprintf(writer, "  <rect x='0' y='0' width='200' height='200' fill='rgb(255,255,255,0)'/>\n")
+				for i := distance / 2; i < 200; i += distance {
+					for j := distance / 2; j < 200; j += distance {
+						fmt.Fprintf(writer, "  <circle cx=\"%d\" cy=\"%d\" r=\"%d\" fill=\"%s\"/>\n", i, j, diameter, hexcolor)
+					}
+				}
+				fmt.Fprintf(writer, "</svg>\n")
+				if err := writer.Flush(); err != nil {
+					log.Fatalf("error <%v> at writer.Flush(), file = <%v>", err, filename)
+				}
+				if err := file.Close(); err != nil {
+					log.Fatalf("error <%v> at file.Close(), file = <%v>", err, filename)
+				}
 			}
 		}
 	}

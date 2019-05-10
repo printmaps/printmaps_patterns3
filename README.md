@@ -1,6 +1,6 @@
 # Patterns 3
 
-Das Utilityprogramm "printmaps_patterns3" erzeugt ein Set an SVG-Pattern (diagonale Schraffuren), welches für kartografische Zwecke hilfreich ist. Beispiel:
+Das Utilityprogramm "printmaps_patterns3" erzeugt SVG-Pattern (diagonale Schraffuren, Punkte), welche für kartografische Zwecke hilfreich sind. Beispiel:
 
 ``` XML
 <?xml version="1.0" encoding="UTF-8"?>
